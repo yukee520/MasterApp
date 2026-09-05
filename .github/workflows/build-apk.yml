@@ -3,15 +3,8 @@ name: Build Android APK
 on:
   push:
     branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
   workflow_dispatch:
     inputs:
-      project_name:
-        description: 'Project Name'
-        required: true
-        default: 'MasterApp'
-        type: string
       build_type:
         description: 'Build Type'
         required: true
@@ -24,18 +17,15 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [18.x]
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
     
-    - name: Setup Node.js ${{ matrix.node-version }}
+    - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version: '18'
         cache: 'npm'
     
     - name: Setup Java
@@ -46,27 +36,27 @@ jobs:
     
     - name: Setup Android SDK
       uses: android-actions/setup-android@v2
-      with:
-        cmdline-tools-version: 9477386
     
     - name: Install dependencies
       run: |
         npm install --legacy-peer-deps
         npm install -g react-native-cli
     
-    - name: Create local.properties
-      run: |
-        echo "sdk.dir=$ANDROID_HOME" > android/local.properties
-        echo "sdk.dir=$ANDROID_HOME" >> android/local.properties
+    - name: Create assets directory
+      run: mkdir -p android/app/src/main/assets
     
-    - name: Build Android APK (Debug)
-      if: github.event.inputs.build_type == 'debug' || github.event_name == 'push' || github.event_name == 'pull_request'
+    - name: Bundle React Native app
+      run: |
+        npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
+    
+    - name: Build Debug APK
+      if: github.event.inputs.build_type == 'debug' || github.event_name == 'push'
       run: |
         cd android
         chmod +x gradlew
         ./gradlew assembleDebug
     
-    - name: Build Android APK (Release)
+    - name: Build Release APK
       if: github.event.inputs.build_type == 'release'
       run: |
         cd android
@@ -74,7 +64,7 @@ jobs:
         ./gradlew assembleRelease
     
     - name: Upload Debug APK
-      if: github.event.inputs.build_type == 'debug' || github.event_name == 'push' || github.event_name == 'pull_request'
+      if: github.event.inputs.build_type == 'debug' || github.event_name == 'push'
       uses: actions/upload-artifact@v3
       with:
         name: MasterApp-debug
@@ -86,25 +76,3 @@ jobs:
       with:
         name: MasterApp-release
         path: android/app/build/outputs/apk/release/*.apk
-    
-    - name: Create Release
-      if: github.event.inputs.build_type == 'release'
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: v${{ github.run_number }}
-        release_name: Release v${{ github.run_number }}
-        draft: false
-        prerelease: false
-    
-    - name: Upload Release Assets
-      if: github.event.inputs.build_type == 'release'
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: android/app/build/outputs/apk/release/*.apk
-        asset_name: MasterApp-${{ github.event.inputs.project_name || 'MasterApp' }}.apk
-        asset_content_type: application/vnd.android.package-archive

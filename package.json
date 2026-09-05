@@ -1,15 +1,21 @@
 {
-  "name": "masterapp",
+  "name": "MasterApp",
   "version": "1.0.0",
   "description": "Master App - React Native Project Manager",
   "main": "index.js",
   "scripts": {
     "start": "react-native start",
     "android": "react-native run-android",
+    "ios": "react-native run-ios",
     "test": "jest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "bundle-android": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res"
   },
-  "keywords": ["react-native", "project-manager", "termux"],
+  "keywords": [
+    "react-native",
+    "project-manager",
+    "termux"
+  ],
   "author": "yukee520",
   "license": "ISC",
   "dependencies": {
@@ -17,8 +23,8 @@
     "@react-navigation/native": "^6.1.9",
     "@react-navigation/native-stack": "^6.9.17",
     "axios": "^1.6.2",
-    "react": "^18.2.0",
-    "react-native": "^0.72.6",
+    "react": "18.2.0",
+    "react-native": "0.72.6",
     "react-native-gesture-handler": "^2.14.0",
     "react-native-safe-area-context": "^4.8.2",
     "react-native-screens": "^3.29.0",
@@ -28,9 +34,10 @@
   "devDependencies": {
     "@babel/core": "^7.20.0",
     "@babel/runtime": "^7.20.0",
+    "@react-native/metro-config": "^0.72.12",
     "babel-jest": "^29.2.1",
     "jest": "^29.2.1",
     "metro-react-native-babel-transformer": "^0.72.0",
-    "react-test-renderer": "^18.2.0"
+    "react-test-renderer": "18.2.0"
   }
 }
