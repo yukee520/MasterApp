@@ -40,3 +40,15 @@ dependencies {
 project.ext.react = [
     enableHermes: false,
 ]
+
+// Force JSC instead of Hermes
+configurations.all {
+    resolutionStrategy {
+        force 'org.webkit:android-jsc:r250000'
+    }
+}
+
+// Add JSC dependency explicitly
+dependencies {
+    implementation "org.webkit:android-jsc:+"
+}
