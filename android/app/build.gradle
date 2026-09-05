@@ -2,12 +2,12 @@ apply plugin: "com.android.application"
 apply plugin: "com.facebook.react"
 
 android {
-    compileSdkVersion rootProject.ext.compileSdkVersion
+    compileSdkVersion 33
 
     defaultConfig {
         applicationId "com.masterapp"
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
+        minSdkVersion 21
+        targetSdkVersion 33
         versionCode 1
         versionName "1.0"
     }
@@ -34,7 +34,9 @@ android {
 
 dependencies {
     implementation "com.facebook.react:react-native:+"
-    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
 }
 
-apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
+// Force JSC instead of Hermes
+project.ext.react = [
+    enableHermes: false,
+]

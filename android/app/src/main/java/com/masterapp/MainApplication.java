@@ -6,12 +6,14 @@ import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
-import java.util.Arrays;
+import com.facebook.react.defaults.DefaultReactNativeHost;
+import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;
 import java.util.List;
+import java.util.Arrays;
 
 public class MainApplication extends Application implements ReactApplication {
 
-  private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
+  private final ReactNativeHost mReactNativeHost = new DefaultReactNativeHost(this) {
     @Override
     public boolean getUseDeveloperSupport() {
       return BuildConfig.DEBUG;
@@ -28,6 +30,16 @@ public class MainApplication extends Application implements ReactApplication {
     protected String getJSMainModuleName() {
       return "index";
     }
+
+    @Override
+    protected boolean isNewArchEnabled() {
+      return BuildConfig.IS_NEW_ARCHITECTURE_ENABLED;
+    }
+
+    @Override
+    protected Boolean isHermesEnabled() {
+      return BuildConfig.IS_HERMES_ENABLED;
+    }
   };
 
   @Override
@@ -39,5 +51,8 @@ public class MainApplication extends Application implements ReactApplication {
   public void onCreate() {
     super.onCreate();
     SoLoader.init(this, false);
+    if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
+      DefaultNewArchitectureEntryPoint.load();
+    }
   }
 }
