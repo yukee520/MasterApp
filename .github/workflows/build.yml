@@ -4,6 +4,15 @@ on:
   push:
     branches: [ main, master ]
   workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Build Type'
+        required: true
+        default: 'debug'
+        type: choice
+        options:
+          - debug
+          - release
 
 jobs:
   build:
@@ -33,11 +42,18 @@ jobs:
         npm install --legacy-peer-deps
         npm install -g react-native-cli
     
+    - name: Clean duplicate files
+      run: |
+        # Remove duplicate masterapptemp package
+        rm -rf android/app/src/main/java/com/masterapptemp || true
+        rm -rf android/app/src/debug/java/com/masterapptemp || true
+        rm -rf android/app/src/release/java/com/masterapptemp || true
+    
     - name: Build APK
       run: |
         cd android
         chmod +x gradlew
-        ./gradlew assembleDebug --info
+        ./gradlew assembleDebug
     
     - name: Upload APK
       uses: actions/upload-artifact@v4
